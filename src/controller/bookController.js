@@ -140,6 +140,9 @@ module.exports = {
         .where({
             id: params
         })
+        .orWhere({
+            uri_book: params
+        })
         .then((result)=>{
             res.status(200).json({
                 status: 200,
@@ -149,5 +152,5 @@ module.exports = {
         .catch((error) => {
             res.send(error)
         })
-    }
+    },
 }
