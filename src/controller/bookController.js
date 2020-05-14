@@ -24,13 +24,21 @@ module.exports = {
             description,
             author,
         } = req.body;
+        const bookUri = (title) => {
+            const datew = new Date().toLocaleDateString().replace('/','-').replace('/','-')
+            let uri = title.toLowerCase().split(" ").join("-")
+            let uri2 = `book-${datew}-${uri}`
+            return uri2
+          }
         const data = {
             title,
             description,
             author,
             image: 'https://semantic-ui.com/images/wireframe/image.png',
             id_category: 2,
-            created_at: new Date()
+            created_at: new Date(),
+            uri_book: bookUri(title),
+            status: 1
         }
 
         knex('book').insert(data)
@@ -124,6 +132,22 @@ module.exports = {
         })
     },
     detailsBook : (req, res) => {
-        res.send(req.params.detail)
+        const params = req.params.detail
+        console.log(params)
+        knex('book')
+        .join('book_category', 'book.id_category', '=', 'book_category.id_category')
+        .select('*')
+        .where({
+            id: params
+        })
+        .then((result)=>{
+            res.status(200).json({
+                status: 200,
+                response: result
+            })
+        })
+        .catch((error) => {
+            res.send(error)
+        })
     }
 }
