@@ -1,12 +1,13 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+require('dotenv').config();
 const knex = require('knex')({
     client: 'mysql',
     connection: {
-    host : 'localhost',
-    user : 'slucter',
-    password : 'ASDqwe123!@#',
-    database : 'library_web'
+    host : process.env.DB_HOST,
+    user : process.env.DB_USER,
+    password : process.env.DB_PASS,
+    database : process.env.DB_NAME
     }
 })
 
@@ -14,6 +15,8 @@ module.exports = {
     getAllUser: (req, res) => {
         knex('user')
         .then((result) => {
+            // let dataNy = result[0]
+            // delete dataNy.password
             res.status(200).json({
                 status: 200,
                 res: result
