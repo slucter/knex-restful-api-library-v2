@@ -11,7 +11,7 @@ const knex = require('knex')({
 
 module.exports = {
     getAllBook : (req, res) => {
-        knex('book')
+        knex('book').innerJoin('book_category', 'book.id_category', 'book_category.id_category')
         .then((result)=>{
             res.status(200).json({
                 msg: 'success',
@@ -24,6 +24,7 @@ module.exports = {
             title,
             description,
             author,
+            publisher,
         } = req.body;
         const bookUri = (title) => {
             const datew = new Date().toLocaleDateString().replace('/','-').replace('/','-')
@@ -34,6 +35,7 @@ module.exports = {
         const data = {
             title,
             description,
+            publisher,
             author,
             image: 'https://semantic-ui.com/images/wireframe/image.png',
             id_category: 2,

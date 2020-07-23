@@ -37,7 +37,8 @@ module.exports = {
                     fullname,
                     email,
                     telephone,
-                    address
+                    address,
+                    username
                 } = req.body;
 
                 const data = {
@@ -46,6 +47,7 @@ module.exports = {
                     telephone,
                     password: hash,
                     address,
+                    username,
                     is_active: 0,
                     token: 1337,
                     role_id: 1
@@ -100,18 +102,33 @@ module.exports = {
                         let tokenw = jwt.sign({ id: Ud.id, email: Ud.email}, 'irhashGans');
                         delete Ud.password
                         Ud.token = tokenw
-                       res.status(200).json({
+                        res.status(200).json({
                            status: 200,
                            message: 'Berhasil Login',
+                           code: 1,
                            response:  Ud
                        })
+                    //    console.log(rehash)
                     } else {
-                        res.send('Password Salah')
+                        let Ud = result[0]
+                        res.status(200).json({
+                            status: 401,
+                            message: 'Password Salah',
+                            response:  Ud,
+                            code: 2
+                        })
+                        // console.log(rehash)
                     }
                 })
 
             } else {
-                res.send('Email Not Registered!')
+                let Ud = result[0]
+                res.status(200).json({
+                    status: 401,
+                    message: 'User tidak terdaftar!',
+                    response:  Ud,
+                    code: 3
+                })
             }
         }).catch((error) => {
             res.send(error)
