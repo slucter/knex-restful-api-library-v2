@@ -1,6 +1,16 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 require('dotenv').config();
+const md5 = require('md5')
+const nodemailer = require('nodemailer');
+const { json } = require('body-parser');
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'slucter133@gmail.com',
+        pass: 'canseris123',
+    }
+});
 const knex = require('knex')({
     client: 'mysql',
     connection: {
@@ -36,21 +46,20 @@ module.exports = {
                 const {
                     fullname,
                     email,
-                    telephone,
-                    address,
                     username
                 } = req.body;
-
+                let salting = md5(email);
                 const data = {
                     fullname,
                     email,
-                    telephone,
+                    telephone: 0,
                     password: hash,
-                    address,
+                    address: 'default',
                     username,
                     is_active: 0,
                     token: 1337,
-                    role_id: 1
+                    role_id: 1,
+                    salting: salting,
                 }
                 knex('user').where({
                     email: email
@@ -64,6 +73,7 @@ module.exports = {
                     } else {
                         knex('user').insert(data)
                         .then((result) => {
+                            console.log(result)
                             res.status(200).json({
                                 status: 200,
                                 messages: 'Berhasil Sign-up',
@@ -99,7 +109,7 @@ module.exports = {
                     if(rehash){
 
                         let Ud = result[0]
-                        let tokenw = jwt.sign({ id: Ud.id, email: Ud.email}, 'irhashGans');
+                        let tokenw = jwt.sign({ id: Ud.id, email: Ud.email, salt: Ud.salt, role: Ud.role_id}, 'irhashGans');
                         delete Ud.password
                         Ud.token = tokenw
                         res.status(200).json({
@@ -132,6 +142,72 @@ module.exports = {
             }
         }).catch((error) => {
             res.send(error)
+        })
+    },
+    detailUser : (req, res)=>{
+        const who = req.params.s;
+        knex('user')
+        .where({id: who})
+        .then((rst)=>{
+            res.status(200).json({
+                staus: 200,
+                rst,
+            })
+        })
+        .catch(()=>{
+            res.status(200).json({
+                staus: 404,
+                msg: 'Not Found',
+            })
+        })
+    },
+    sendMail : (req, res)=>{
+        const { subject, email, text } = req.body;
+        const mailOptions = {
+            from: 'irhashjeh@gmail.com',
+            to: email,
+            subject: subject,
+            text: text,
+        }
+        transporter.sendMail(mailOptions, (err, info)=>{
+            if(err){
+                res.status(200).json({
+                    status: 401,
+                    msg: 'Error',
+                })
+            }else{
+                res.status(200).json({
+                    status: 200,
+                    msg: 'success',
+                })
+            }
+        })
+    },
+    updateConfirm : (req, res)=>{
+        const token = req.query.token;
+        jwt.verify(token, 'irhashGans', (err, ress)=>{
+            if(err){
+                res.status(200).json({
+                    status: 401,
+                    msg: 'Token Invalid'
+                })
+            }else{
+                knex('user').where({
+                    id: ress.id
+                }).update({
+                    is_active: 1,
+                })
+                .then((result)=>{
+                    res.status(200).json({
+                        status: 200,
+                        msg: 'Token Valid',
+                        res: result
+                    })
+                })
+                .catch((err)=>{
+                    console.log(err)
+                })
+            }
         })
     }
 }

@@ -24,7 +24,8 @@ module.exports = {
             title,
             description,
             author,
-            publisher,
+            image,
+            id_category,
         } = req.body;
         const bookUri = (title) => {
             const datew = new Date().toLocaleDateString().replace('/','-').replace('/','-')
@@ -35,10 +36,10 @@ module.exports = {
         const data = {
             title,
             description,
-            publisher,
+            publisher: 'Tom Cruise',
             author,
-            image: 'https://semantic-ui.com/images/wireframe/image.png',
-            id_category: 2,
+            image,
+            id_category,
             created_at: new Date(),
             uri_book: bookUri(title),
             status: 1
@@ -58,13 +59,15 @@ module.exports = {
             title,
             description,
             author,
+            id_category,
+            image,
         } = req.body;
         const data = {
             title,
             description,
             author,
-            image: 'https://semantic-ui.com/images/wireframe/image.png',
-            id_category: 2,
+            image,
+            id_category,
             created_at: new Date()
         }
         knex('book').where('id', idBook).update(data)
