@@ -174,6 +174,8 @@ module.exports = {
                 res.status(200).json({
                     status: 401,
                     msg: 'Error',
+                    err,
+                    info
                 })
             }else{
                 res.status(200).json({
