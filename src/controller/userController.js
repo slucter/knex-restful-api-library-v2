@@ -7,8 +7,8 @@ const { json } = require('body-parser');
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'slucter133@gmail.com',
-        pass: 'canseris123',
+        user: process.env.MAILER_EMAIL,
+        pass: process.env.MAILER_PW,
     }
 });
 const knex = require('knex')({
